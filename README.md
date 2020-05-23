@@ -1,1 +1,3 @@
-# electron-music 音乐播放器
+# electron-quick-start
+
+# electron 分为主进程和渲染进程
