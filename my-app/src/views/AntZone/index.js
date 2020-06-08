@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Button, Table, Space } from "antd";
+import { Menu, Button, Table, Space, Pagination } from "antd";
 import mpv from "../../static/qingkuai.mp3";
 import {
   MailOutlined,
@@ -51,17 +51,24 @@ class AntZone extends React.Component {
       current: "mail",
       data: [],
       src: "",
+      total: 1,
     };
   }
   componentDidMount() {
     console.log("主页面第一次");
     ipcRenderer.on("getTracks", (event, tracks) => {
       console.log("主页面", tracks);
+      tracks.map((item) => {
+        item.key = item.id;
+        return item;
+      });
       this.setState({
         data: tracks,
+        total: tracks.length,
       });
       allTracks = tracks;
     });
+    console.log(this.state);
   }
   handleClick = (e) => {
     console.log("click ", e);
@@ -86,61 +93,81 @@ class AntZone extends React.Component {
     //   currentTrack.fileName
     // }`;
     audio.play();
+    console.log(typeof this.state.data.length);
   };
   render() {
     return (
-      <div>
-        <Menu
-          onClick={this.handleClick}
-          selectedKeys={[this.state.current]}
-          mode="horizontal"
-        >
-          <Menu.Item key="mail" icon={<MailOutlined />}>
-            Navigation One
-          </Menu.Item>
-          <Menu.Item key="app" disabled icon={<AppstoreOutlined />}>
-            Navigation Two
-          </Menu.Item>
-          <SubMenu
-            icon={<SettingOutlined />}
-            title="Navigation Three - Submenu"
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ height: "48px" }}>
+          <Menu
+            onClick={this.handleClick}
+            selectedKeys={[this.state.current]}
+            mode="horizontal"
           >
-            <Menu.ItemGroup title="Item 1">
-              <Menu.Item key="setting:1">Option 1</Menu.Item>
-              <Menu.Item key="setting:2">Option 2</Menu.Item>
-            </Menu.ItemGroup>
-            <Menu.ItemGroup title="Item 2">
-              <Menu.Item key="setting:3">Option 3</Menu.Item>
-              <Menu.Item key="setting:4">Option 4</Menu.Item>
-            </Menu.ItemGroup>
-          </SubMenu>
-          <Menu.Item key="alipay">
-            <a
-              href="https://ant.design"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Navigation Four - Link
-            </a>
-          </Menu.Item>
-        </Menu>
-        <header style={{ textAlign: "center", margin: "20px" }}>
+            <Menu.Item key="mail" icon={<MailOutlined />}>
+              全部音乐列表
+            </Menu.Item>
+            <Menu.Item key="app" icon={<AppstoreOutlined />}>
+              热门列表
+            </Menu.Item>
+            <SubMenu icon={<SettingOutlined />} title="个人音乐">
+              <Menu.ItemGroup title="Item 1">
+                <Menu.Item key="setting:1">Option 1</Menu.Item>
+                <Menu.Item key="setting:2">Option 2</Menu.Item>
+              </Menu.ItemGroup>
+              <Menu.ItemGroup title="Item 2">
+                <Menu.Item key="setting:3">Option 3</Menu.Item>
+                <Menu.Item key="setting:4">Option 4</Menu.Item>
+              </Menu.ItemGroup>
+            </SubMenu>
+            <Menu.Item key="alipay">
+              <a
+                href="https://ant.design"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                播放记录
+              </a>
+            </Menu.Item>
+          </Menu>
+        </div>
+        <header style={{ textAlign: "center", padding: "10px" }}>
           <h2>个人音乐播放器</h2>
         </header>
-        <Button
-          type="primary"
-          style={{ marginLeft: "20px" }}
-          onClick={this.sendClick.bind(this)}
-        >
-          添加歌曲到曲库
-        </Button>
-        <div>
+        <nav style={{ padding: "10px" }}>
+          <Button type="primary" onClick={this.sendClick.bind(this)}>
+            添加歌曲到曲库
+          </Button>
+        </nav>
+        <div style={{ flex: "1", overflowY: "scroll" }}>
           <Table
             columns={columns({ playAudio: this.playAudio })}
             dataSource={this.state.data}
+            pagination={false}
           />
         </div>
-        <audio id="audio" controls="controls" src={mpv}></audio>
+        <div
+          style={{
+            height: "50px",
+            display: "flex",
+            justifyContent: "flex-end",
+            marginRight: "20px",
+          }}
+        >
+          <Pagination
+            defaultCurrent={1}
+            total={this.state.total}
+            pageSize={10}
+          />
+        </div>
+        <audio id="audio" src={mpv}></audio>
       </div>
     );
   }
