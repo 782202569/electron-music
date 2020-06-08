@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "antd";
+const path = require("path");
 const { ipcRenderer } = window.require("electron");
 class addMusic extends React.Component {
   name_with_namespace;
@@ -35,17 +36,20 @@ class addMusic extends React.Component {
       }
     });
   };
-
+  exportMusic = (e) => {
+    ipcRenderer.send("add-tracks", this.state.musicFilesPath);
+  };
   render() {
     return (
       <div>
         <h2>选择音乐</h2>
         <div>
           <Button onClick={this.chioceMusic.bind(this)}>选择音乐</Button>
+          <Button onClick={this.exportMusic.bind(this)}>导入音乐</Button>
         </div>
         <div>
           {this.state.musicFilesPath.map((item, index) => {
-            return <div key={index}>{item}</div>;
+            return <div key={index}>{path.basename(item)}</div>;
           })}
         </div>
       </div>

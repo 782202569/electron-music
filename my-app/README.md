@@ -1,3 +1,5 @@
+项目执行 1.npm run estart 2.npm run start
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
