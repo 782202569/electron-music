@@ -40,6 +40,7 @@ class AppWindow extends BrowserWindow {
 app.on("ready", () => {
   // require("devtron").install();
   let mainWindow = new AppWindow({}, "http://localhost:3000/");
+  let addWindow;
   mainWindow.webContents.on("did-finish-load", () => {
     console.log("did finisgh");
     mainWindow.send("getTracks", myStore.getTracks());
@@ -53,7 +54,7 @@ app.on("ready", () => {
 
   ipcMain.on("add-music-window", (event, arg) => {
     console.log("hello add-music");
-    const addWindow = new AppWindow(
+    addWindow = new AppWindow(
       {
         width: 500,
         height: 400,
@@ -80,11 +81,17 @@ app.on("ready", () => {
       });
   });
 
+  ipcMain.on("delete-track", (event, id) => {
+    const updatedTracks = myStore.deleteTrack(id).getTracks();
+    console.log(updatedTracks);
+    mainWindow.send("getTracks", updatedTracks);
+  });
   ipcMain.on("add-tracks", (event, tracks) => {
     console.log(tracks);
     const updatedTracks = myStore.addTracks(tracks).getTracks();
     console.log(updatedTracks);
     mainWindow.send("getTracks", updatedTracks);
+    addWindow.close();
   });
   // let secondWindow = new BrowserWindow({
   //  width: 400,

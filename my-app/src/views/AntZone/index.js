@@ -16,7 +16,7 @@ let currentTrack;
 const { ipcRenderer } = window.require("electron");
 /*const socket = io('ws://127.0.0.1:7000')*/
 const columns = (props) => {
-  const { playAudio } = props;
+  const { playAudio, deleteAudio } = props;
   return [
     {
       title: "文件名",
@@ -36,7 +36,7 @@ const columns = (props) => {
       render: (text, record) => (
         <Space size="middle">
           <a onClick={() => playAudio(record.id)}>播放</a>
-          <a>删除</a>
+          <a onClick={() => deleteAudio(record.id)}>删除</a>
         </Space>
       ),
     },
@@ -95,6 +95,9 @@ class AntZone extends React.Component {
     audio.play();
     console.log(typeof this.state.data.length);
   };
+  deleteAudio = (e) => {
+    ipcRenderer.send("delete-track", e);
+  };
   render() {
     return (
       <div
@@ -148,7 +151,10 @@ class AntZone extends React.Component {
         </nav>
         <div style={{ flex: "1", overflowY: "scroll" }}>
           <Table
-            columns={columns({ playAudio: this.playAudio })}
+            columns={columns({
+              playAudio: this.playAudio,
+              deleteAudio: this.deleteAudio,
+            })}
             dataSource={this.state.data}
             pagination={false}
           />
